@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   Code, 
@@ -31,6 +31,24 @@ export default function ServicesClientPage() {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [activePillarId, setActivePillarId] = useState<string>("software-development");
   const [selectedSubService, setSelectedSubService] = useState<SubService | null>(null);
+
+  useEffect(() => {
+    const syncHash = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash && SERVICE_PILLARS.some((p) => p.id === hash)) {
+        setActivePillarId(hash);
+        const el = document.getElementById("pillar-section");
+        if (el) {
+          setTimeout(() => {
+            el.scrollIntoView({ behavior: "smooth" });
+          }, 100);
+        }
+      }
+    };
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, []);
 
   const activePillar =
     SERVICE_PILLARS.find((p) => p.id === activePillarId) || SERVICE_PILLARS[0];
@@ -135,7 +153,7 @@ export default function ServicesClientPage() {
       </section>
 
       {/* Main Service Pillars Navigation & Detailed Grid */}
-      <section className="py-20 md:py-28 max-w-7xl mx-auto px-6 md:px-8">
+      <section className="py-20 md:py-28 max-w-7xl mx-auto px-6 md:px-8" id="pillar-section">
         {/* Pillar Switcher Tabs */}
         <div className="flex items-center gap-3 overflow-x-auto pb-4 mb-12 scrollbar-none">
           {SERVICE_PILLARS.map((pillar) => {

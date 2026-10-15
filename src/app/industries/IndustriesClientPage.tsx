@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { 
@@ -31,6 +31,24 @@ export default function IndustriesClientPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [activeIndustryId, setActiveIndustryId] = useState<string>("healthcare");
+
+  useEffect(() => {
+    const syncHash = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash && INDUSTRY_VERTICALS.some((i) => i.id === hash)) {
+        setActiveIndustryId(hash);
+        const el = document.getElementById("industry-section");
+        if (el) {
+          setTimeout(() => {
+            el.scrollIntoView({ behavior: "smooth" });
+          }, 100);
+        }
+      }
+    };
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, []);
 
   const activeIndustry =
     INDUSTRY_VERTICALS.find((i) => i.id === activeIndustryId) || INDUSTRY_VERTICALS[0];
@@ -109,7 +127,7 @@ export default function IndustriesClientPage() {
       </section>
 
       {/* Interactive Sector Switcher Tabs */}
-      <section className="py-12 bg-white border-b border-blue-100">
+      <section className="py-12 bg-white border-b border-blue-100" id="industry-section">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-none">
             {INDUSTRY_VERTICALS.map((ind) => {
